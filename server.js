@@ -1,6 +1,10 @@
-const http = require('http');
+const http = require("http");
+const app = require("./app");
+
+app.set("port", process.env.PORT || 3000);
+
 const server = http.createServer((req, res) => {
-    res.end('Voila la réponse du serveur') 
+  res.end("Voila la réponse du serveur");
 });
 
 // chargement des variables d'environnement du fichier .env dans process.env

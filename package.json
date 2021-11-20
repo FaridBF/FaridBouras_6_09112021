@@ -1,0 +1,24 @@
+{
+  "name": "faridbouras_6_09112021",
+  "version": "1.0.0",
+  "description": "<br>_Sixième projet du parcours \"Développeur web\" chez [OpenClassrooms](https://openclassrooms.com/fr/paths/185/projects/676/assignment)._</br>",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/FaridBF/FaridBouras_6_09112021.git"
+  },
+  "author": "Bouras_Farid",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/FaridBF/FaridBouras_6_09112021/issues"
+  },
+  "homepage": "https://github.com/FaridBF/FaridBouras_6_09112021#readme",
+  "dependencies": {
+    "dotenv": "^10.0.0",
+    "express": "^4.17.1",
+    "mongoose": "^6.0.13"
+  }
+}

@@ -1,11 +1,12 @@
 const express = require("express");
 
-const mongoose = require("mongoose");
+const userRoutes = require("./routes/user"); // importation du routeur (dossier routes puis prendre fichier user.js)
 
 // chargement des variables d'environnement du fichier .env dans process.env
 const dotenv = require("dotenv");
 dotenv.config();
 
+const mongoose = require("mongoose");
 // Connexion à la base de données
 mongoose
   .connect(
@@ -23,7 +24,10 @@ app.use((req, res, next) => {
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
   ); // les headers autorisés (en têtes)
-  res.setHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE"); // les méthodes autorisées (verbes de requêtes)
+  res.setHeader(
+    "Access-Control-Allow-Methods",
+    "GET, POST, PUT, DELETE, PATCH, OPTIONS"
+  ); // les méthodes autorisées (verbes de requêtes)
   next();
 });
 
@@ -35,4 +39,5 @@ app.use(
   })
 );
 
+app.use("/api/auth", userRoutes); // enregistrement de la route ici // route attendu par le frontend '/api/auth' - la racine de tout ce qui est lié à l'authentification
 module.exports = app;

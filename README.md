@@ -32,13 +32,15 @@ Le repository de la partie front-end est fournie par Openclassrooms. \
 1- Cloner le repository du back-end : `git clone ` \
 2- Vérifier si NodeJS et npm sont installés sur votre machine : `node --version && npm --version` \
 3- Si vous souhaitez développer, installez Nodemon qui surveillera les modifications de vos fichiers et redémarrera le serveur automatiquement. Vérifiez si nodemon est installé sur votre machine : `npx nodemon --version`, sinon l'installer en lançant `npm install -g nodemon` \
-4- Créer un fichier `.env` à la racine du projet qui contiendra les variables d'environnement suivantes:
+4- Créer un fichier `.env` à la racine du projet qui contiendra les variables d'environnement suivantes: \
+(N'indiquez le port que celui-ci s'avère différent par défaut de node.js, à savoir le port 3000)
 
 ```
 PORT=<valeur_du_port_si_3000_est_déja_occupé>
 NAME_DATABASE=<nom_de_votre_base_de_données>
 USER_DB=<votre_identifiant_de_base_de_données>
 PASSWORD_DB=<votre_mot_de_passe_de_base_de_données>
+SECRET_TOKEN=<votre_cle_secrete_pour_générer_token_authentification>
 ```
 
 ### **Les Prérequis pour la réalisation de ce projet**:

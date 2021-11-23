@@ -31,7 +31,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// transformation du corps de la requête en objet JS utilisable (remplace body parser)
+// transformation du corps de la requête en objet JSON utilisable (remplace body parser)
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -40,4 +40,5 @@ app.use(
 );
 
 app.use("/api/auth", userRoutes); // enregistrement de la route ici // route attendu par le frontend '/api/auth' - la racine de tout ce qui est lié à l'authentification
+
 module.exports = app;

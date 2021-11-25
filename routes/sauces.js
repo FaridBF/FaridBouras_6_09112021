@@ -21,4 +21,10 @@ router.get("/", auth, saucesCtrl.getAllSauces);
 // traitement des requêtes post
 router.post("/", auth, multer, saucesCtrl.createSauce); // auth - on ajoute le middleware à la route que l'on souhaite protéger (multer après auth car vérif avant traitement de l'image)
 
+// route put pour la modification d'un objet existant qui sera envoyé au moment ou l'utilisateur procédera à la modification de cet objet via le bouton modifier
+router.put("/:id", auth, multer, saucesCtrl.modifySauce);
+
+// route delete pour la suppresion d'un objet
+router.delete("/:id", auth, saucesCtrl.deleteSauce);
+
 module.exports = router; // réexport sur router de ce fichier là

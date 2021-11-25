@@ -1,6 +1,8 @@
 const Sauces = require("../models/Sauces"); // require permet d'importer un modèle lorsqu'il s'agit d'un chemin local
 // remplacement de app par router car enregistrement de toutes ces routes sur le router
 
+const fs = require("fs"); // import du package de node js filesystem (accès aux # opérations liés au système de fichiers)
+
 //Afficher toutes les sauces//
 exports.getAllSauces = (req, res, next) => {
   Sauces.find() // retourne Promise
@@ -36,4 +38,40 @@ exports.createSauce = (req, res, next) => {
     .save() // la méthode save enregistre l'objet dans la base
     .then(() => res.status(201).json({ message: "Objet enregistré !" })) // réponse d'un code 201 pour bonne création de la ressource
     .catch((error) => res.status(400).json({ error }));
+};
+
+// Pour modifier une sauce//
+exports.modifySauce = (req, res, next) => {
+  const saucesObject = req.file // opréateur permettant de demander si req.file existe
+    ? {
+        // si on trouve un fichier
+        ...JSON.parse(req.body.sauce), // on récupère la chaîne de caractère puis on la parse en objet
+        imageUrl: `${req.protocol}://${req.get("host")}/images/${
+          //puis en modifie l'image URL
+          req.file.filename
+        }`,
+      }
+    : { ...req.body }; // et Sinon on prends le corps de la reqûete
+  Sauces.updateOne(
+    { _id: req.params.id },
+    { ...saucesObject, _id: req.params.id } // on prends cet objet que nous avons créé peu importe son format, de là on modifie son identifiant afin que cela corresponde au paramètre de requête
+  ) // méthode update one permet de modifier l'objet en question
+    .then(() => res.status(200).json({ message: "Objet modifié !" }))
+    .catch((error) => res.status(400).json({ error }));
+};
+
+// Supprimer une sauce//
+exports.deleteSauce = (req, res, next) => {
+  Sauces.findOne({ _id: req.params.id }) // trouver le produit en question via findOne
+    .then((sauces) => {
+      // dans le callback on récupère un thing
+      const filename = sauces.imageUrl.split("/images/")[1]; // récupération de l'imageURL du thing récupérer par la base (on spilt le tableau des 2 éléments)
+      fs.unlink(`images/${filename}`, () => {
+        // fonction unlink de fs pour supprimer un fichier en lui passant le fichier à supprimer et le callback à exécuter une fois ce fichier supprimé
+        Sauces.deleteOne({ _id: req.params.id }) //méthode delete one permet de supprimer l'objet en question (avec objet de comparaison en argument comme pour find one et update one)
+          .then(() => res.status(200).json({ message: "Objet supprimé !" }))
+          .catch((error) => res.status(400).json({ error }));
+      });
+    })
+    .catch((error) => res.status(500).json({ error })); // erreur serveur si produit non trouvé
 };

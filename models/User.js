@@ -1,4 +1,4 @@
-// comme pour les things on va importer mongoose afin de créer un schéma
+// on importe mongoose afin de créer un schéma
 const mongoose = require("mongoose");
 // à la suite de l'installation du packgage on va ajouter ce validator comme plugin à notre schéma
 const uniqueValidator = require("mongoose-unique-validator");

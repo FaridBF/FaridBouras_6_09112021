@@ -5,6 +5,7 @@ const dotenv = require("dotenv"); // chargement des variables d'environnement du
 dotenv.config();
 
 const helmet = require("helmet");
+const session = require("cookie-session");
 
 const userRoutes = require("./routes/user"); // importation du routeur (dossier routes puis prendre fichier user.js)
 const saucesRoutes = require("./routes/sauces"); // importation du routeur (dossier models puis prendre fichier saucesjs)
@@ -47,6 +48,22 @@ app.use(
 // // Sécuriser Express en définissant divers en-têtes HTTP ( collection de neuf fonctions middleware)
 app.use(helmet());
 
+//Options de sécurisation des cookies pour accroître la sécurité
+const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
+app.use(
+  session({
+    name: process.env.SECRET_NAME,
+    secret: process.env.SECRET_SESSION,
+    cookie: {
+      secure: true, // Garantit que le navigateur n’envoie le cookie que sur HTTPS
+      httpOnly: true, //- Garantit que le cookie n’est envoyé que sur HTTP(S), pas au JavaScript du client, c'est contre les attaques de type cross-site scripting
+      domain: `http://localhost:${process.env.port || "3000"}`, //indique quels hôtes peuvent recevoir le cookie
+      expires: expiryDate, //définir la date d’expiration des cookies persistants
+      path: "/", //définit les urls autorisées à recevoir le cookie
+    },
+  })
+);
+
 //Rendre le dossier  des "images" complémentement statique
 app.use("/images", express.static(path.join(__dirname, "images"))); // Cela indique à Express qu'il faut gérer la ressource images de manière statique
 //(un sous-répertoire de notre répertoire de base, __dirname ) à chaque fois qu'elle reçoit une requête vers la route /images
@@ -57,12 +74,3 @@ app.use("/api/sauces", saucesRoutes); // on remet le début de la route en premi
 // et ensuite on dit en second paramètre que pour cette route là on importe le routeur qui est exporter par sauces.js
 
 module.exports = app;
-
-// const mongoSanitize = require('express-mongo-sanitize');
-// const nocache = require('nocache');
-
-// /* Désinfecte les inputs contre les injections */
-// app.use(mongoSanitize());
-
-// /* Désactive la mise en cache du navigateur */
-// app.use(nocache());

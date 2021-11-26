@@ -64,8 +64,8 @@ exports.modifySauce = (req, res, next) => {
 exports.deleteSauce = (req, res, next) => {
   Sauces.findOne({ _id: req.params.id }) // trouver le produit en question via findOne
     .then((sauces) => {
-      // dans le callback on récupère un thing
-      const filename = sauces.imageUrl.split("/images/")[1]; // récupération de l'imageURL du thing récupérer par la base (on spilt le tableau des 2 éléments)
+      // dans le callback on récupère les sauces ( déclarer dans le then)
+      const filename = sauces.imageUrl.split("/images/")[1]; // récupération de l'imageURL afin de récupérer par la base (on spilt le tableau des 2 éléments)
       fs.unlink(`images/${filename}`, () => {
         // fonction unlink de fs pour supprimer un fichier en lui passant le fichier à supprimer et le callback à exécuter une fois ce fichier supprimé
         Sauces.deleteOne({ _id: req.params.id }) //méthode delete one permet de supprimer l'objet en question (avec objet de comparaison en argument comme pour find one et update one)
@@ -74,4 +74,58 @@ exports.deleteSauce = (req, res, next) => {
       });
     })
     .catch((error) => res.status(500).json({ error })); // erreur serveur si produit non trouvé
+};
+
+// Pour aimer ou ne pas aimer une sauce//
+exports.likeOrDislike = (req, res, next) => {
+  if (req.body.like === 1) {
+    Sauces.updateOne(
+      //mettre à jour le premier document d'une collection qui correspond à une condition
+      { _id: req.params.id },
+      {
+        //Opérateur permmettant d'utilisez la notation par points.
+        $inc: { likes: req.body.like++ }, // incrémente un champ d'une valeur spécifiée sous forme suivante : { $inc : { <field1> : <amount1>, <field2> : <amount2>, ... } }
+        $push: { usersLiked: req.body.userId }, // l'opérateur $push est utilisé pour ajouter une valeur spécifiée à un tableau
+      }
+    )
+      .then((sauce) => res.status(200).json({ message: "Like ajouté !" }))
+      .catch((error) => res.status(400).json({ error }));
+  } else if (req.body.like === -1) {
+    Sauces.updateOne(
+      { _id: req.params.id }, //req.params est pour les paramètres de l'itinéraire, dans cet itinéraire c'est _id:
+      {
+        $inc: { dislikes: req.body.like++ * -1 }, //Le $inc accepte les valeurs positives et négatives comme montant incrémentiel.
+        $push: { usersDisliked: req.body.userId }, ////l'opérateur $push ajoute en tant que nouveau champ et inclut la valeur mentionnée comme élément.
+      } //$addToSet n'ajoute pas l'élément au champ donné s'il le contient déjà
+    )
+      .then((sauce) => res.status(200).json({ message: "Dislike ajouté !" }))
+      .catch((error) => res.status(400).json({ error }));
+  } else {
+    Sauces.findOne({ _id: req.params.id })
+      .then((sauce) => {
+        if (sauce.usersLiked.includes(req.body.userId)) {
+          Sauces.updateOne(
+            { _id: req.params.id },
+            { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } } //$pull supprime d'un tableau existant toutes les instances d'une valeur ou de valeurs qui correspondent à une condition spécifiée
+          )
+            .then((sauce) => {
+              res.status(200).json({ message: "Like en moins !" });
+            })
+            .catch((error) => res.status(400).json({ error }));
+        } else if (sauce.usersDisliked.includes(req.body.userId)) {
+          Sauces.updateOne(
+            { _id: req.params.id },
+            {
+              $pull: { usersDisliked: req.body.userId },
+              $inc: { dislikes: -1 },
+            }
+          )
+            .then((sauce) => {
+              res.status(200).json({ message: "Dislike en moins !" });
+            })
+            .catch((error) => res.status(400).json({ error }));
+        }
+      })
+      .catch((error) => res.status(400).json({ error }));
+  }
 };

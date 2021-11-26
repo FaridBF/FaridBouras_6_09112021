@@ -4,6 +4,8 @@ const path = require("path"); // importation afin d'avoir le chemin de notre sys
 const dotenv = require("dotenv"); // chargement des variables d'environnement du fichier .env dans process.env
 dotenv.config();
 
+const helmet = require("helmet");
+
 const userRoutes = require("./routes/user"); // importation du routeur (dossier routes puis prendre fichier user.js)
 const saucesRoutes = require("./routes/sauces"); // importation du routeur (dossier models puis prendre fichier saucesjs)
 
@@ -42,13 +44,25 @@ app.use(
   })
 );
 
+// // Sécuriser Express en définissant divers en-têtes HTTP ( collection de neuf fonctions middleware)
+app.use(helmet());
+
 //Rendre le dossier  des "images" complémentement statique
 app.use("/images", express.static(path.join(__dirname, "images"))); // Cela indique à Express qu'il faut gérer la ressource images de manière statique
 //(un sous-répertoire de notre répertoire de base, __dirname ) à chaque fois qu'elle reçoit une requête vers la route /images
 
-// Enregistrement des routes
+// Enregistrement des routes dans notre application
 app.use("/api/auth", userRoutes); // enregistrement de la route ici // route attendu par le frontend '/api/auth' - la racine de tout ce qui est lié à l'authentification
 app.use("/api/sauces", saucesRoutes); // on remet le début de la route en premier paramètre
 // et ensuite on dit en second paramètre que pour cette route là on importe le routeur qui est exporter par sauces.js
 
 module.exports = app;
+
+// const mongoSanitize = require('express-mongo-sanitize');
+// const nocache = require('nocache');
+
+// /* Désinfecte les inputs contre les injections */
+// app.use(mongoSanitize());
+
+// /* Désactive la mise en cache du navigateur */
+// app.use(nocache());

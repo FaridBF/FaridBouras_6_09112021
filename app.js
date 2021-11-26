@@ -6,6 +6,7 @@ dotenv.config();
 
 const helmet = require("helmet");
 const session = require("cookie-session");
+const nocache = require("nocache");
 
 const userRoutes = require("./routes/user"); // importation du routeur (dossier routes puis prendre fichier user.js)
 const saucesRoutes = require("./routes/sauces"); // importation du routeur (dossier models puis prendre fichier saucesjs)
@@ -63,6 +64,9 @@ app.use(
     },
   })
 );
+
+//Pour désactiver la mise en cache du navigateur, va donc ajouter no-cache en-têtes
+app.use(nocache()); //les utilisateurs non connectés ne pourront pas ouvrir les anciennes pages mises en cache
 
 //Rendre le dossier  des "images" complémentement statique
 app.use("/images", express.static(path.join(__dirname, "images"))); // Cela indique à Express qu'il faut gérer la ressource images de manière statique

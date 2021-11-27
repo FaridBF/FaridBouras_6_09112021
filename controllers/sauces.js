@@ -78,38 +78,52 @@ exports.deleteSauce = (req, res, next) => {
 
 // Pour aimer ou ne pas aimer une sauce//
 exports.likeOrDislike = (req, res, next) => {
+  // console.log(req);
+  // console.log("params: ", req.params);
+  // console.log("body: ", req.body);
   if (req.body.like === 1) {
     Sauces.updateOne(
-      //mettre à jour le premier document d'une collection qui correspond à une condition
+      // met à jour le premier document d'une collection qui correspond à une condition
       { _id: req.params.id },
       {
-        //Opérateur permmettant d'utilisez la notation par points.
-        $inc: { likes: req.body.like++ }, // incrémente un champ d'une valeur spécifiée sous forme suivante : { $inc : { <field1> : <amount1>, <field2> : <amount2>, ... } }
+        // Opérateur permmettant d'utilisez la notation par points.
+        $inc: { likes: req.body.like }, // incrémente un champ d'une valeur spécifiée sous forme suivante : { $inc : { <field1> : <amount1>, <field2> : <amount2>, ... } }
         $push: { usersLiked: req.body.userId }, // l'opérateur $push est utilisé pour ajouter une valeur spécifiée à un tableau
       }
     )
-      .then((sauce) => res.status(200).json({ message: "Like ajouté !" }))
+      .then(() =>
+        res
+          .status(200)
+          .json({ message: "Votre like a été ajouté pour ce produit !" })
+      )
       .catch((error) => res.status(400).json({ error }));
   } else if (req.body.like === -1) {
     Sauces.updateOne(
-      { _id: req.params.id }, //req.params est pour les paramètres de l'itinéraire, dans cet itinéraire c'est _id:
+      { _id: req.params.id }, // req.params est pour les paramètres de l'itinéraire, dans cet itinéraire c'est _id:
       {
-        $inc: { dislikes: req.body.like++ * -1 }, //Le $inc accepte les valeurs positives et négatives comme montant incrémentiel.
+        $inc: { dislikes: req.body.like }, //Le $inc accepte les valeurs positives et négatives comme montant incrémentiel.
         $push: { usersDisliked: req.body.userId }, ////l'opérateur $push ajoute en tant que nouveau champ et inclut la valeur mentionnée comme élément.
-      } //$addToSet n'ajoute pas l'élément au champ donné s'il le contient déjà
+      }
     )
-      .then((sauce) => res.status(200).json({ message: "Dislike ajouté !" }))
+      .then(() =>
+        res
+          .status(200)
+          .json({ message: "Votre dislike a été ajouté pour ce produit !" })
+      )
       .catch((error) => res.status(400).json({ error }));
   } else {
+    // si like === 0
     Sauces.findOne({ _id: req.params.id })
       .then((sauce) => {
         if (sauce.usersLiked.includes(req.body.userId)) {
           Sauces.updateOne(
             { _id: req.params.id },
-            { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } } //$pull supprime d'un tableau existant toutes les instances d'une valeur ou de valeurs qui correspondent à une condition spécifiée
+            { $pull: { usersLiked: req.body.userId }, $inc: { likes: -1 } } //$pull supprime le user id du tableau et fait -1 sur likes
           )
-            .then((sauce) => {
-              res.status(200).json({ message: "Like en moins !" });
+            .then(() => {
+              res
+                .status(200)
+                .json({ message: "Votre like a été retiré pour ce produit !" });
             })
             .catch((error) => res.status(400).json({ error }));
         } else if (sauce.usersDisliked.includes(req.body.userId)) {
@@ -117,11 +131,13 @@ exports.likeOrDislike = (req, res, next) => {
             { _id: req.params.id },
             {
               $pull: { usersDisliked: req.body.userId },
-              $inc: { dislikes: -1 },
+              $inc: { dislikes: +1 },
             }
           )
-            .then((sauce) => {
-              res.status(200).json({ message: "Dislike en moins !" });
+            .then(() => {
+              res.status(200).json({
+                message: "Votre dislike a été retiré pour ce produit !",
+              });
             })
             .catch((error) => res.status(400).json({ error }));
         }

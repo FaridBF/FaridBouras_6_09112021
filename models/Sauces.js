@@ -1,4 +1,4 @@
-// création d'un schéma ( modèle de données), afin de connaître les objets qui sont en ventes dans notre base de données.
+// création d'un schéma ( modèle de données), afin de connaître les sauces qui sont dans notre base de données.
 // import de mongoose afin d'exploiter mongoose dans ce fichier
 const mongoose = require("mongoose");
 

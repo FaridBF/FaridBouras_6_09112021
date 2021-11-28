@@ -4,9 +4,11 @@ const path = require("path"); // importation afin d'avoir le chemin de notre sys
 const dotenv = require("dotenv"); // chargement des variables d'environnement du fichier .env dans process.env
 dotenv.config();
 
-const helmet = require("helmet");
-const session = require("cookie-session");
+const helmet = require("helmet"); // collection de neuf fonctions middleware concernant la protection des en-têtes
+const session = require("cookie-session"); // évite le vol de session
 const nocache = require("nocache");
+const cors = require("cors"); //le package node.js cors (l'utilisation la plus simple)
+const mongoSanitize = require("express-mongo-sanitize"); // examine le corps de la demande, va supprimer les signes et les points dollar ( $ ) ( . ) avant d'exécuter les requêtes
 
 const userRoutes = require("./routes/user"); // importation du routeur (dossier routes puis prendre fichier user.js)
 const saucesRoutes = require("./routes/sauces"); // importation du routeur (dossier models puis prendre fichier saucesjs)
@@ -46,7 +48,7 @@ app.use(
   })
 );
 
-// // Sécuriser Express en définissant divers en-têtes HTTP ( collection de neuf fonctions middleware)
+// // Sécuriser Express en définissant divers en-têtes HTTP
 app.use(helmet());
 
 //Options de sécurisation des cookies pour accroître la sécurité
@@ -65,8 +67,14 @@ app.use(
   })
 );
 
+// Assainissement des données contre l'injection de requêtes NoSQL
+app.use(mongoSanitize());
+
 //Pour désactiver la mise en cache du navigateur, va donc ajouter no-cache en-têtes
 app.use(nocache()); //les utilisateurs non connectés ne pourront pas ouvrir les anciennes pages mises en cache
+
+//CORS sert à alléger la sécurité en autorisant les requêtes vers d’autres domaines
+app.use(cors()); //le navigateur envoie l’entête Origin. Le serveur répond en incluant l’entête Access-Control-Allow-Origin pour autoriser ou non la requête.
 
 //Rendre le dossier  des "images" complémentement statique
 app.use("/images", express.static(path.join(__dirname, "images"))); // Cela indique à Express qu'il faut gérer la ressource images de manière statique

@@ -1,5 +1,4 @@
 const Sauces = require("../models/Sauces"); // require permet d'importer un modèle lorsqu'il s'agit d'un chemin local
-// remplacement de app par router car enregistrement de toutes ces routes sur le router
 
 const fs = require("fs"); // import du package de node js filesystem (accès aux # opérations liés au système de fichiers)
 
@@ -24,8 +23,7 @@ exports.createSauce = (req, res, next) => {
   //on va supprimer le champs avant de copier l'objet
   delete saucesObject._id;
   const sauce = new Sauces({
-    // création d'une nouvelle instance
-    ...saucesObject, // raccourci js de title: req.body.title,
+    ...saucesObject, //synthaxe de décompostion
     imageUrl: `${req.protocol}://${req.get("host")}/images/${
       req.file.filename // modifications de l'URL de l'image (récupération des segments nécessaires de là ou se trouve notre image)
     }`,
@@ -38,7 +36,7 @@ exports.createSauce = (req, res, next) => {
     .save() // la méthode save enregistre l'objet dans la base
     .then(() =>
       res.status(201).json({ message: "Votre sauce est enregistrée !" })
-    ) // réponse d'un code 201 pour bonne création de la ressource
+    )
     .catch((error) => res.status(400).json({ error }));
 };
 
@@ -58,7 +56,7 @@ exports.modifySauce = (req, res, next) => {
   Sauces.updateOne(
     { _id: req.params.id },
     { ...saucesObject, _id: req.params.id } // on prend cet objet que nous avons créé peu importe son format, de là on modifie son identifiant afin que cela corresponde au paramètre de requête
-  ) // méthode update one permet de modifier l'objet en question
+  )
     .then(() => res.status(200).json({ message: "Votre sauce est modifiée !" }))
     .catch((error) => res.status(400).json({ error }));
 };
@@ -68,10 +66,10 @@ exports.deleteSauce = (req, res, next) => {
   Sauces.findOne({ _id: req.params.id }) // trouver le produit en question via findOne
     .then((sauce) => {
       // dans le callback on récupère les sauces ( déclarer dans le then)
-      const filename = sauce.imageUrl.split("/images/")[1]; // récupération de l'imageURL afin de récupérer par la base (on spilt le tableau des 2 éléments)
+      const filename = sauce.imageUrl.split("/images/")[1]; // récupération de l'imageURL afin de récupérer par la base (on split le tableau des 2 éléments)
       fs.unlink(`images/${filename}`, () => {
         // fonction unlink de fs pour supprimer un fichier en lui passant le fichier à supprimer et le callback à exécuter une fois ce fichier supprimé
-        Sauces.deleteOne({ _id: req.params.id }) //méthode delete one permet de supprimer l'objet en question (avec objet de comparaison en argument comme pour find one et update one)
+        Sauces.deleteOne({ _id: req.params.id }) //permet de supprimer l'objet en question (avec objet de comparaison en argument comme pour find one et update one)
           .then(() =>
             res.status(200).json({ message: "Votre sauce est supprimée !" })
           )
@@ -92,7 +90,7 @@ exports.likeOrDislike = (req, res, next) => {
       { _id: req.params.id },
       {
         // Opérateur permmettant d'utilisez la notation par points.
-        $inc: { likes: req.body.like }, // incrémente un champ d'une valeur spécifiée sous forme suivante : { $inc : { <field1> : <amount1>, <field2> : <amount2>, ... } }
+        $inc: { likes: 1 }, // incrémente un champ d'une valeur spécifiée sous forme suivante : { $inc : { <field1> : <amount1>, <field2> : <amount2>, ... } }
         $push: { usersLiked: req.body.userId }, // l'opérateur $push est utilisé pour ajouter une valeur spécifiée à un tableau
       }
     )
@@ -106,7 +104,7 @@ exports.likeOrDislike = (req, res, next) => {
     Sauces.updateOne(
       { _id: req.params.id }, // req.params est pour les paramètres de l'itinéraire, dans cet itinéraire c'est _id:
       {
-        $inc: { dislikes: req.body.like }, //Le $inc accepte les valeurs positives et négatives comme montant incrémentiel.
+        $inc: { dislikes: 1 }, //Le $inc accepte les valeurs positives et négatives comme montant incrémentiel.
         $push: { usersDisliked: req.body.userId }, ////l'opérateur $push ajoute en tant que nouveau champ et inclut la valeur mentionnée comme élément.
       }
     )
@@ -136,7 +134,7 @@ exports.likeOrDislike = (req, res, next) => {
             { _id: req.params.id },
             {
               $pull: { usersDisliked: req.body.userId },
-              $inc: { dislikes: +1 },
+              $inc: { dislikes: -1 },
             }
           )
             .then(() => {

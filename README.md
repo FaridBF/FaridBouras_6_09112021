@@ -41,6 +41,8 @@ NAME_DATABASE=<nom_de_votre_base_de_données>
 USER_DB=<votre_identifiant_de_base_de_données>
 PASSWORD_DB=<votre_mot_de_passe_de_base_de_données>
 SECRET_TOKEN=<votre_cle_secrete_pour_générer_token_authentification>
+SECRET_NAME=<nom_de_session>
+SECRET_SESSION=<phrase_secrète_de_session>
 ```
 
 ### **Les Prérequis pour la réalisation de ce projet**:

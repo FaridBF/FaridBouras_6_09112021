@@ -5,13 +5,14 @@ const dotenv = require("dotenv"); // chargement des variables d'environnement du
 dotenv.config();
 
 const helmet = require("helmet"); // collection de neuf fonctions middleware concernant la protection des en-têtes
+// const csp = require("helmet-csp"); // commenter volontairement (présentation uniquement à l'oral)
+
 const session = require("cookie-session"); // évite le vol de session
 const nocache = require("nocache");
-const cors = require("cors"); //le package node.js cors (l'utilisation la plus simple)
 const mongoSanitize = require("express-mongo-sanitize"); // examine le corps de la demande, va supprimer les signes et les points dollar ( $ ) ( . ) avant d'exécuter les requêtes
 
-const userRoutes = require("./routes/user"); // importation du routeur (dossier routes puis prendre fichier user.js)
-const saucesRoutes = require("./routes/sauces"); // importation du routeur (dossier models puis prendre fichier saucesjs)
+const userRoutes = require("./routes/user"); // importation du routeur
+const saucesRoutes = require("./routes/sauces");
 
 // Connexion à la base de données MongoDB
 mongoose
@@ -25,10 +26,9 @@ mongoose
 // Lancement du framework Express //
 const app = express();
 
-// permet de pallier à l'erreur CORS afin de donner l'accès aux requêtes envoyés à nos serveurs
-//Middleware CORS - Ajout de headers à l'objet "response"
+// Permet de pallier à l'erreur CORS afin de donner l'accès aux requêtes envoyés à nos serveurs / Middleware CORS - Ajout de headers à l'objet "response"
 app.use((req, res, next) => {
-  res.setHeader("Access-Control-Allow-Origin", "*"); // * accès à tout le monde
+  res.setHeader("Access-Control-Allow-Origin", "*");
   res.setHeader(
     "Access-Control-Allow-Headers",
     "Origin, X-Requested-With, Content, Accept, Content-Type, Authorization"
@@ -36,11 +36,11 @@ app.use((req, res, next) => {
   res.setHeader(
     "Access-Control-Allow-Methods",
     "GET, POST, PUT, DELETE, PATCH, OPTIONS"
-  ); // les méthodes autorisées (verbes de requêtes)
+  );
   next();
 });
 
-// transformation du corps de la requête en objet JSON utilisable (remplace body parser)
+// Transformation du corps de la requête en objet JSON utilisable (remplace body parser)
 app.use(express.json());
 app.use(
   express.urlencoded({
@@ -48,8 +48,27 @@ app.use(
   })
 );
 
-// // Sécuriser Express en définissant divers en-têtes HTTP
+//Sécuriser Express en définissant divers en-têtes HTTP
 app.use(helmet());
+
+// //Middleware complémentaire pour gérer le CSP : helmet-csp
+// app.use(
+//   csp({
+//     directives: {
+//       defaultSrc: ["'self'"], // requête faite du site vers le site
+
+//       scriptSrc: ["'self'"], // utilisation du script uniquement du site
+
+//       imgSrc: ["'self'"], // pour gestion des images en interne
+
+//       sandbox: ["allow-forms", "allow-scripts"], // autorisation des forms et scripts
+
+//       reportUri: "/report-violation", // une redirection en cas de violation du site
+
+//       upgradeInsecureRequests: true, // mettre mon serveur au courant
+//     },
+//   })
+// );
 
 //Options de sécurisation des cookies pour accroître la sécurité
 const expiryDate = new Date(Date.now() + 60 * 60 * 1000); // 1 heure
@@ -67,21 +86,17 @@ app.use(
   })
 );
 
-// Assainissement des données contre l'injection de requêtes NoSQL
+// Assainissement des données, désinfecte les inputs contre l'injection de requêtes NoSQL
 app.use(mongoSanitize());
 
 //Pour désactiver la mise en cache du navigateur, va donc ajouter no-cache en-têtes
 app.use(nocache()); //les utilisateurs non connectés ne pourront pas ouvrir les anciennes pages mises en cache
 
-//CORS sert à alléger la sécurité en autorisant les requêtes vers d’autres domaines
-app.use(cors()); //le navigateur envoie l’entête Origin. Le serveur répond en incluant l’entête Access-Control-Allow-Origin pour autoriser ou non la requête.
-
 //Rendre le dossier  des "images" complémentement statique
 app.use("/images", express.static(path.join(__dirname, "images"))); // Cela indique à Express qu'il faut gérer la ressource images de manière statique
-//(un sous-répertoire de notre répertoire de base, __dirname ) à chaque fois qu'elle reçoit une requête vers la route /images
 
 // Enregistrement des routes dans notre application
-app.use("/api/auth", userRoutes); // enregistrement de la route ici // route attendu par le frontend '/api/auth' - la racine de tout ce qui est lié à l'authentification
+app.use("/api/auth", userRoutes); // enregistrement de la route ici // route attendu par le frontend '/api/auth'
 app.use("/api/sauces", saucesRoutes); // on remet le début de la route en premier paramètre
 // et ensuite on dit en second paramètre que pour cette route là on importe le routeur qui est exporter par sauces.js
 

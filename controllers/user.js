@@ -1,27 +1,19 @@
-//package de cryptage pour les mot de passe  npm install -- save bcrypt
-// suite à l'installation on importe
 const bcrypt = require("bcrypt"); // Le package bcrpyt permet un cryptage sécurisé avec un algorithme unidirectionnel.
-
-// package token à installer (permet d'encoder un token afin de vérifier si l'utilisateur s'est bien authentifier) - npm install --save jsonwebtoken
-// suite à l'installation on importe comme ceci:
 const jwt = require("jsonwebtoken");
 
 // chargement des variables d'environnement du fichier .env dans process.env
 const dotenv = require("dotenv");
 dotenv.config();
 
-const User = require("../models/User"); // on a besoin de notre model user car on enregistrer et lire des users dans ce middleware
+const User = require("../models/User");
 
-// infrastructure controller pour le user
-// 2 fonction => 2 middleware
-// pour l'enregistrement de nouveaux utilisateurs
+// infrastructure controller pour le user concernant l'enregistrement de nouveaux utilisateurs
 exports.signup = (req, res) => {
   bcrypt
-    .hash(req.body.password, 10) // hash permet de crypter le mdp (fonction asynchonne)
-    //puis on lui passe le mdp du corps de la reqûete qui sera passé par le frontend
+    .hash(req.body.password, 10) // hash permet de crypter le mdp (fonction asynchonne) puis on lui passe le mdp du corps de la reqûete qui sera passé par le frontend
     // le solde 10 c'est le nombre de fois ou on éxécute l'algorithme de hashage (plus le nombre est élévé plus l'éxécution mettra de temps)
     .then((hash) => {
-      // on récupère le hash de mot de passe
+      // on récupère le hash de mdp
       const user = new User({
         // création d'un nouvel utilisateur avec notre model mongoose
         email: req.body.email, // on passe en adresse mail ce qui est fournit dans le corps de la requête
@@ -53,16 +45,14 @@ exports.login = (req, res) => {
             // renvoyer un statut connexion pour confirmation la bonne réalisation de la reqûete
             userId: user._id, // identifiant de l'utilisateur
             token: jwt.sign(
-              // génération d'un token crypté par la suite pour l'instant on envoie juste un token comme celui-ci (simplement une chaîne de caractère)
-              // fonction sign prend plusieurs arguments
+              // génération d'un token crypté par la suite pour l'instant on envoie juste un token comme celui-ci (une chaîne de caractère)
               { userId: user._id }, //le premier argument est user id: identifiant utilisateur
-              process.env.SECRET_TOKEN, // le deuxième argument : clé secrète pr l'encodage normalement une châine de caractère plus longue et aléatoire
-              { expiresIn: "24h" } // le troisième argument est  une argument de configuration , en l'occurence ici c'est la durée de validité du token
+              process.env.SECRET_TOKEN, // le deuxième argument : clé secrète pr l'encodage
+              { expiresIn: "24h" } // le troisième argument concerne la configuration, en l'occurence ici c'est la durée de validité du token
             ),
           });
         })
-        .catch((error) => res.status(500).json({ error }));
-      // problème de connexion liée à mongo DB - erreur 500 : serveur
+        .catch((error) => res.status(500).json({ error })); // problème de connexion liée à mongo DB - erreur 500 : serveur
     })
     .catch((error) => res.status(500).json({ error }));
 };

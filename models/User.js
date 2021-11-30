@@ -5,9 +5,7 @@ const uniqueValidator = require("mongoose-unique-validator");
 
 const userSchema = mongoose.Schema({
   // méthode schema de mongoose //
-  email: { type: String, required: true, unique: true }, // les infos que l'on va stocker
-  // unique permet d'éviter que plusieurs User s'enregistre avec la meme adresse mail // installer en parallèle npm install --save mongoose-unique-validator
-  //cette technique unique:true  fonctionne mais ne suffit pas d'ou la nécessité du packagage pour éviter certaines erreurs illisibles
+  email: { type: String, required: true, unique: true }, // les infos que l'on va stocker /unique permet d'éviter que plusieurs User s'enregistre avec la meme adresse mail
   password: { type: String, required: true }, // le hash sera de type string également
 });
 

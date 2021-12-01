@@ -1,6 +1,5 @@
 // Création d'un middleware d'authentification pour vérifier le token envoyé par l'application frontend avec sa reqûete
-// s'il s'agit d'un token valable et que le UserID qui est envoyé avec la requête, qu'il corresponde bien avec celui qui est encoder dans le token
-// pour chaque reqûete protéger on va passer par ce middleware
+// s'il s'agit d'un token valable et que le UserID qui est envoyé avec la requête, qu'il corresponde bien avec celui qui est encoder dans le token (pour chaque reqûete protéger on va passer par ce middleware)
 
 const jwt = require("jsonwebtoken"); // le package jsonwebtoken afin de vérifier les tokens
 

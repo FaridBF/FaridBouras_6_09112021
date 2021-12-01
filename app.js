@@ -97,7 +97,6 @@ app.use("/images", express.static(path.join(__dirname, "images"))); // Cela indi
 
 // Enregistrement des routes dans notre application
 app.use("/api/auth", userRoutes); // enregistrement de la route ici // route attendu par le frontend '/api/auth'
-app.use("/api/sauces", saucesRoutes); // on remet le début de la route en premier paramètre
-// et ensuite on dit en second paramètre que pour cette route là on importe le routeur qui est exporter par sauces.js
+app.use("/api/sauces", saucesRoutes); // début de la route en premier paramètre et routeur en deuxième paramètre qui est exporter par sauces.js
 
 module.exports = app;

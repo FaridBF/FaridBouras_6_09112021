@@ -89,5 +89,3 @@ Exigences de sécurité :
 👉 [L'énoncé du projet](https://openclassrooms.com/fr/paths/185/projects/638/assignment)
 
 👉 [Cahier des charges](https://s3.eu-west-1.amazonaws.com/course.oc-static.com/projects/DWJ_FR_P6/Requirements_DW_P6.pdf)
-
-👉 [Le site déployé sur Github Pages](https://faridbf.github.io/FaridBouras_6_09112021/)

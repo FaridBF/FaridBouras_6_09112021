@@ -1,26 +1,36 @@
-const multer = require("multer"); // importer multer
+const multer = require("multer");
 
 const MIME_TYPES = {
-  // dictionnnaire de mime_types indiquant donc les traductions (objet)
-  "image/jpg": "jpg",
+  // dictionnnaire de mime_types indiquant donc les traductions(objet)
   "image/jpeg": "jpg",
-  "image/png": "png",
+  "image/jpg": "jpg",
+  "image/png": "png"
 };
 
 const storage = multer.diskStorage({
-  // fonction de multer qui est diskStorage afin d'indiquer que l'enregistrement se fera sur le disque
+  // f° afin d'indiquer que l'enrgt se fera sur le disque
   destination: (req, file, callback) => {
-    //fonction destination (3 arguments: la requête, le fichier et un callback) - cela explique à multer où enregistrer le fichier
-    callback(null, "images"); // 1er argument null afin d'indiquer qu'il n'y a pas eu d'erreurs à ce niveau là / 2 ème arguments : le dossier images
+    // f° destination (3 arguments: la requête, le fichier et un callback)
+    // cela explique à multer où enregistrer le fichier
+    callback(null, "images");
+    // 1er en null afin d'indiquer qu'il n'y a pas eu d'erreurs
+    // 2ème arguments:le dossier images
   },
   filename: (req, file, callback) => {
-    // fonction permettant d'expliquer le nom du fichier à utiliser
-    // on génère le nouveau nom pour le fichier en utilisant le nom d'origine du fichier via la propriété originalname
-    const name = file.originalname.split(" ").join("_").split(".", 1); // on remplace les espaces par des underscore et supprime l'extension d'origine
-    const extension = MIME_TYPES[file.mimetype]; // création de l'extension du fichier: ça sera l'élément de notre dict° correspondant au mimetype du fichier envoyé par le frontend
-    callback(null, name + Date.now() + "." + extension); // Date.now: c'est un timestamp afin de le rendre le plus unique possible
-  },
+    // f° permettant d'expliquer le nom du fichier à utiliser
+    // on génère le nouveau nom pour le fichier via originalname
+    const name = file.originalname.split(" ").join("_").split(".", 1);
+    // remplace les espaces par des underscore et supprime l'extension d'origine
+    const extension = MIME_TYPES[file.mimetype];
+    // création de l'extension du fichier:
+    // l'élément de notre dict° correspondant au mimetype envoyé par le frontend
+    callback(null, name + Date.now() + "." + extension);
+    // Date.now:c'est un timestamp afin de le rendre le plus unique possible
+  }
 });
 
-module.exports = multer({ storage: storage }).single("image"); // exporter le middleware complétement configuré (méthode single afin d'inidquer qu'il s'agit d'un fichier unique)
-// on passe notre objet storage à notre méthore multer / on indique image à single car il s'agit uniquement d'image
+// exporter le middleware configuré
+module.exports = multer({ storage: storage }).single("image");
+// méthode single pour dire que c'et un fichier unique
+//  on passe notre objet storage à notre méthode multer
+// on indique image à single car il s'agit uniquement d'image

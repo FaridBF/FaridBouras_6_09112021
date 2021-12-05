@@ -10,17 +10,17 @@ dotenv.config();
 module.exports = (req, res, next) => {
   // exportation du middleware
   try {
-    const token = req.headers.authorization.split(" ")[1];
     // récupération du deuxième élément de ce tableau  via split
-    const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+    const token = req.headers.authorization.split(" ")[1];
     // constante pour decoder le token
     // (clé secrète en argument identique à la fonction login)
-    const userId = decodedToken.userId;
+    const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
     // récupération du user ID encoder dans l'objet JS
+    const userId = decodedToken.userId;
+    // vérif du userID dans le corps de la requête différent du userID du token
     if (req.body.userId && req.body.userId !== userId) {
-      // vérif du userID dans le corps de la requête différent du userID du token
-      throw "Invalid user ID";
       // on ne souhaite pas authentifier la requête
+      throw "Invalid user ID";
     } else {
       // si tout va bien on va simplement appeler next
       next(); // appliquer avant les controllers de nos routes
